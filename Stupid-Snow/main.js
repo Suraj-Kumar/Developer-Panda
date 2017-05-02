@@ -35,6 +35,7 @@ app.post('/message', function (req, res) {
   console.log("message received from webhook "+req.body.message );
    const message = req.body;
    const query=req.query;
+   if(message.to=="stupid_snow@applozic.com"){
    var apiUrl = "https://api.api.ai/api/query?query="+req.body.message+"&lang=en&sessionId=09874634636463&v=20150910";
   var senMessageUrl= " https://apps.applozic.com/rest/ws/message/v2/send";
    var options = {
@@ -75,6 +76,7 @@ var data = JSON.parse(body);
 		});
 	
    }); 
+}
 });
 
 
