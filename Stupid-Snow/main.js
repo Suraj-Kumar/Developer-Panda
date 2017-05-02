@@ -41,7 +41,7 @@ app.post('/message', function (req, res) {
    var options = {
   		url: apiUrl,
   		headers: {
-    	'Authorization': 'Bearer 62fb218723f24c2087485442dfd11ca0'
+    	'Authorization': 'Bearer fd6ee6ffc6d744f49473c38f09e6c318'
   		}
 	};
 	
