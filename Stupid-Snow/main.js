@@ -32,6 +32,7 @@ app.get('/index', function (req, res) {
 
 
 app.post('/message', function (req, res) {
+  console.log("message received from webhook "+req.body.message );
    const message = req.body;
    const query=req.query;
    var apiUrl = "https://api.api.ai/api/query?query="+req.body.message+"&lang=en&sessionId=09874634636463&v=20150910";
@@ -44,9 +45,10 @@ app.post('/message', function (req, res) {
 	};
 	
 	request(options,function(err,response,body){
-		console.log(body);
-		var data = JSON.parse(body);
+var data = JSON.parse(body);
 		var result=data.result;
+		console.log("response received from API.AI "+result.fulfillment.speech);
+		
 		//console.log("\n result  \n"+JSON.stringify(result));
 		console.log("response received from API.AI "+result.fulfillment.speech);
 		var sendMessageOptions={
