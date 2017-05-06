@@ -41,7 +41,7 @@ app.post('/message', function (req, res) {
    var options = {
   		url: apiUrl,
   		headers: {
-    	'Authorization': 'Bearer fd6ee6ffc6d744f49473c38f09e6c318'
+    	'Authorization': 'Bearer 77ce1347c98d4cffb7aebc9e20bd2478'
   		}
 	};
 	
@@ -77,7 +77,91 @@ var data = JSON.parse(body);
 	
    }); 
 }
+
+
+
 });
+
+app.get('/isFirstConversation', function (req, res) {
+  
+
+   var userId= req.query.userId;
+   console.log("userId received : "+userId);
+
+   var userDetailParams = {
+		url:"https://apps.applozic.com/rest/ws/message/v2/list?userId="+userId+"&pageSize=1",
+		method:'GET',
+		headers: {
+    	"Access-Token":"suraj",
+		"Application-Key":"156568f01fff47efbfe9f7a6715f072c9",
+		"Authorization":"Basic c3R1cGlkX3Nub3dAYXBwbG96aWMuY29tOmZmNWQ5MzVkLWE0ZjItNGM3ZC05OTY1LWRlNzllMzIxMThiYw=="
+  		}
+
+   };
+
+	request(userDetailParams,function(error,resp,respBody){	
+				console.log(error );
+				if(resp.statusCode==200){
+
+				var data = JSON.parse(respBody);
+				
+					console.log("response body",respBody);
+				console.log("data" ,data.response);
+				var messageLength = data.response.message.length;
+				
+				
+					if(messageLength==0) {
+						res.send(true).end();
+						console.log("new user =: true");
+
+					}else{
+						res.send(false).end();
+						console.log("new user =: flase");
+					}
+  	 }else{
+   	console.log("error occured while fetching messages :");
+   	console.log(error);
+
+	}
+
+ });
+
+});
+
+
+app.get('/welcomeMessage', function (req, res) {
+
+				var userId=req.query.userId;
+
+				var sendMessageOptions={
+				url:"https://apps.applozic.com/rest/ws/message/v2/send",
+				method:'POST',
+				json:{
+					"to":userId,
+  					"message":" Hey There! I am Stupid Snow, Well I am not stupid my master call me that. I am here to help you...."
+					},
+				headers: {
+    				"Access-Token":"suraj",
+					"Application-Key":"156568f01fff47efbfe9f7a6715f072c9",
+					"Authorization":"Basic c3R1cGlkX3Nub3dAYXBwbG96aWMuY29tOmZmNWQ5MzVkLWE0ZjItNGM3ZC05OTY1LWRlNzllMzIxMThiYw=="
+  					}
+
+			};
+		request(sendMessageOptions,function(error,resp,respBody){
+
+			if(resp.statusCode==200){
+				console.log(" message sent to "+userId);
+			}else{
+
+				console.log("not able to send the message.  server has  returned status code: "+resp.statusCode);
+			}	
+			res.end();
+
+		});
+		
+});
+
+
 
 
 

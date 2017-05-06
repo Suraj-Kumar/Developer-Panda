@@ -45,7 +45,8 @@ $(document).ready(function() {
         $('#chat').css('display', 'none');
         $('#chat-box-div').css('display', 'block');
         $applozic.fn.applozic('loadContacts', {"contacts":bot_contacts});
-        //initAutoSuggestions();
+        $applozic.fn.applozic('loadTab', "stupid_snow@applozic.com");
+        sendWelcomeMessageOnFirstConversation($userId.val());
       }
     }
 
@@ -66,9 +67,48 @@ $(document).ready(function() {
       launchOnUnreadMessage: true,
       topicBox: topicBoxEnabled,
       authenticationTypeId: 1,
+     // readConversation: populateWelcomeMessage
       //initAutoSuggestions : initAutoSuggestions
       // topicDetail: function(topicId) {}
     });
+
+    
+
+     
+
+
+    function populateWelcomeMessage(userId){
+    console.log("populating welcome message "+userId);
+        setTimeout(function(){ 
+         $.ajax({
+                url: "/welcomeMessage?userId="+userId,
+                type: 'get',
+                contentType: 'application/json',
+                success: function(result) {
+                  console.log(JSON.stringify(result));
+                }
+                            
+        }); }, 3000);
+
+       
+
+    };
+    function sendWelcomeMessageOnFirstConversation(userId){
+      console.log("checking isFirstConversation "+userId);
+        $.ajax({
+                url: "/isFirstConversation?userId="+userId,
+                type: 'get',
+                contentType: 'application/json',
+                success: function(result) {
+                  console.log("is new user : "+result);
+                  if(result==true){
+                      console.log("populating welcome message");
+                    populateWelcomeMessage(userId); 
+                  }
+                }
+                            
+        });
+    };
     return false;
   });
   $chat_relauncher.on('click', function() {
