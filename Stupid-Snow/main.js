@@ -1,11 +1,35 @@
 console.log("------------------------My Watch Begins!-----------------------");
 
-var http = require("http");
-http.createServer(function(request, response){
-response.writeHead(200, {'Content-Type': 'text/plain'});
-response.end("welcome to the bot server");
-}).listen(5678);
 
+
+var sampleRepos={
+
+	"chat":{
+			"generic":"here you go! www.applozic.com",
+			"web":"here you go for web! www.applozic.com",
+			"android": "here you go for android: www.applozic.com",
+			"ios":"here is the ios link! www.applozic.com"
+			},
+	"dbms":{
+		"generic":"here you go! www.mysql.com",
+		"web":"here you go for web! www.mysql.com",
+			"android": "here you go for android: www.mysql.com",
+			"ios":"here is the ios link! www.mysql.com"
+	},
+	"cache":{
+		"generic":"here you go! www.hazelCast.com",
+			"web":"here you go for web! www.hazelCast.com",
+			"android": "here you go for android: www.hazelcast.com",
+			"ios":"here is the ios link! www.hazelcast.com"
+	},
+	"queue":{
+		"generic":"here you go! www.rabitAMQ.com",
+		"web":"here you go for web! www.rabitAMQ.com",
+			"android": "here you go for android: www.RabbitAMQ.com",
+			"ios":"here is the ios link! www.RabbitAMQ.com"
+	}
+
+}
 
 var express =require("express");
 
@@ -14,6 +38,7 @@ var server = app.listen(8001);
 var path= require("path");
 var bodyParser = require('body-parser');
 var request = require("request");
+//var mongoDbHelper = require("./modules/mongoDbHelper.js");
 // static resources
 app.use('/css', express.static("css"));
 app.use('/js', express.static("js"));
@@ -22,7 +47,7 @@ app.use('/images', express.static("images"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {
+eUrl= app.get('/', function (req, res) {
    res.send('Hello World from express');
 });
 
@@ -35,29 +60,54 @@ app.post('/message', function (req, res) {
   console.log("message received from webhook "+req.body.message );
    const message = req.body;
    const query=req.query;
+   var replyMessage;
    if(message.to=="stupid_snow@applozic.com"){
    var apiUrl = "https://api.api.ai/api/query?query="+req.body.message+"&lang=en&sessionId=09874634636463&v=20150910";
-  var senMessageUrl= " https://apps.applozic.com/rest/ws/message/v2/send";
+  var sendMessageUrl=" https://apps.applozic.com/rest/ws/message/v2/send";
    var options = {
   		url: apiUrl,
   		headers: {
-    	'Authorization': 'Bearer 77ce1347c98d4cffb7aebc9e20bd2478'
+    	'Authorization': 'Bearer eab42d260cc34b128c9821087672a764'
   		}
 	};
 	
 	request(options,function(err,response,body){
-var data = JSON.parse(body);
+	var data = JSON.parse(body);
 		var result=data.result;
-		console.log("response received from API.AI "+result.fulfillment.speech);
+
+		//console.log(result);
+		var param = result.parameters;
+		
+		if(param){
+			console.log(param);
+				if(param.tags.length!=0){
+					var platform= param.plateform!=''?"generic":param.plateform;
+
+					replyMessage= sampleRepos[param.tags][platform];
+
+					//replyMessage= "got you! parameter extracted: platform : "+ param.plateform+"  tags : "+param.tags+" \n calling node server to fullfill your request "
+
+				}
+
+
+		}if(!replyMessage){
+			replyMessage= result.fulfillment.speech;
+		}
+
+		console.log("message reply: "+replyMessage);
+		res.send({"reply message":replyMessage}).end();
+
+
+		//console.log("response received from API.AI "+result.fulfillment.speech);
 		
 		//console.log("\n result  \n"+JSON.stringify(result));
-		console.log("response received from API.AI "+result.fulfillment.speech);
+		//console.log("response received from API.AI "+result.fulfillment.speech);
 		var sendMessageOptions={
-		url:senMessageUrl,
+		url:sendMessageUrl,
 		method:'POST',
 		json:{
 			"to":message.from,
-  			"message":result.fulfillment.speech
+  			"message":replyMessage
 		},
 		headers: {
     	"Access-Token":"suraj",
@@ -71,13 +121,12 @@ var data = JSON.parse(body);
 			if(resp.status==200){
 				console.log(" message sent to "+message.from);
 			}	
-			res.send({"status":resp.status}).end();
+			//res.send({"status":resp.status}).end();
 
 		});
 	
    }); 
 }
-
 
 
 });
@@ -105,7 +154,7 @@ app.get('/isFirstConversation', function (req, res) {
 
 				var data = JSON.parse(respBody);
 				
-					console.log("response body",respBody);
+				console.log("response body",respBody);
 				console.log("data" ,data.response);
 				var messageLength = data.response.message.length;
 				
@@ -159,6 +208,35 @@ app.get('/welcomeMessage', function (req, res) {
 
 		});
 		
+});
+
+
+app.get('/save', function (req, res) {
+
+var doc= {"userNAme":"don","age":"20"};
+
+mongoDbHelper.insert("user",doc);
+res.end();
+
+});
+
+app.get('/getdb', function (req, res) {
+
+var doc= {"userNAme":"don"};
+
+var result = mongoDbHelper.find("user",doc);
+res.send(result).end();
+
+});
+
+
+app.post('/populate', function (req, res) {
+
+var doc= {"userNAme":"don"};
+
+var result = mongoDbHelper.find("user",doc);
+res.send(result).end();
+
 });
 
 
