@@ -78,11 +78,11 @@ app.post('/message', function (req, res) {
 		//console.log(result);
 		var param = result.parameters;
 		
-		if(param){
+		if(!(Object.keys(param).length===0 &&param.constructor===Object)){
 			console.log(param);
-				if(param.tags.length!=0){
-					var platform= param.plateform!=''?"generic":param.plateform;
-
+				if(param.tags && param.tags.length!=0){
+					var platform= param.plateform==''?"generic":param.plateform;
+					console.log("plateform "+platform);
 					replyMessage= sampleRepos[param.tags][platform];
 
 					//replyMessage= "got you! parameter extracted: platform : "+ param.plateform+"  tags : "+param.tags+" \n calling node server to fullfill your request "
@@ -95,7 +95,7 @@ app.post('/message', function (req, res) {
 		}
 
 		console.log("message reply: "+replyMessage);
-		res.send({"reply message":replyMessage}).end();
+		//res.send({"reply message":replyMessage}).end();
 
 
 		//console.log("response received from API.AI "+result.fulfillment.speech);
@@ -121,7 +121,7 @@ app.post('/message', function (req, res) {
 			if(resp.status==200){
 				console.log(" message sent to "+message.from);
 			}	
-			//res.send({"status":resp.status}).end();
+			res.send({"status":resp.status}).end();
 
 		});
 	
