@@ -77,28 +77,36 @@ app.post('/message', function (req, res) {
 
 		//console.log(result);
 		var param = result.parameters;
-		
+		var intent= result.metadata.intentName;
+		console.log(param);
+		console.log(intent);
 		if(!(Object.keys(param).length===0 &&param.constructor===Object)){
-			console.log(param);
-				if(param.tags && param.tags.length!=0){
-					var platform= param.plateform==''?"generic":param.plateform;
-					console.log("plateform "+platform);
-					replyMessage= sampleRepos[param.tags][platform];
+			
+			if(intent=='price.info'){
+
+				if(param.userCount && param.price){
+			replyMessage  = param.userCount<= 25000?"It is $99 per month.":"It is $399 per month.";
+
+				}
+			} else if(param.tags && param.tags.length!=0){
+				var platform= param.plateform==''?"generic":param.plateform;
+				console.log("plateform "+platform);
+				replyMessage= sampleRepos[param.tags][platform];
 
 					//replyMessage= "got you! parameter extracted: platform : "+ param.plateform+"  tags : "+param.tags+" \n calling node server to fullfill your request "
 
-				}
+			}
 
 
-		}if(!replyMessage){
+			}if(!replyMessage){
 			replyMessage= result.fulfillment.speech;
-		}
+			}
 
-		console.log("message reply: "+replyMessage);
-		//res.send({"reply message":replyMessage}).end();
+			console.log("message reply: "+replyMessage);
+			//res.send({"reply message":replyMessage}).end();
 
 
-		//console.log("response received from API.AI "+result.fulfillment.speech);
+			//console.log("response received from API.AI "+result.fulfillment.speech);
 		
 		//console.log("\n result  \n"+JSON.stringify(result));
 		//console.log("response received from API.AI "+result.fulfillment.speech);
